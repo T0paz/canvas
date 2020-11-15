@@ -20,7 +20,7 @@
 float bbrGreen(float kelvin)
 {
     const float a = -155.25485562709179;
-    const float b = -0.44596950469579133;
+    const float b = -0.44596950469579133+1.0;
     const float c = 104.49216199393888;
     float x = (kelvin / 100.0) - 2;
     return (a + b * x + c * log(x)) / 255.0;
@@ -28,7 +28,7 @@ float bbrGreen(float kelvin)
 
 // Estimates blue color component for black body radiation at input temperature.
 // For range we are using, can assume red component is 1.0
-float bbrBlue(float kelvin)
+/*float bbrBlue(float kelvin)
 {
 	if(kelvin < 2000.0) return 0.0;
     const float a = -254.76935184120902;
@@ -36,15 +36,15 @@ float bbrBlue(float kelvin)
     const float c = 115.67994401066147;
     float x = (kelvin / 100.0) - 10.0;
     return (a + b * x + c * log(x)) / 255.0;
-}
+}*/
 
 void frx_startFragment(inout frx_FragmentData fragData) {
 	float t = frx_renderSeconds();
-	vec2 uv = frx_var0.xy * 4.00 + t * frx_var0.zw;
-	float n = cellular2x2x2(vec3(uv.xy, t * 0.2)).x;
+	vec2 uv = floor(frx_var0.xy * 16) / 16 * 4.00 + t * frx_var0.zw;
+	float n = cellular2x2x2(vec3(uv.xy, t * 0.4)).x;
 //	n = 1.0 - n;
 //	n *= n;
 //	n = 1.0 - n;
-	float v = 700 + n * 2000;
-	fragData.spriteColor = vec4(1.0, bbrGreen(v), bbrBlue(v), 1.0);
+	float v = 300 + n * 2000;
+	fragData.spriteColor = vec4(1.0, clamp(((bbrGreen(v)/0.66*0.35)+0.20),0.30,0.66), clamp((bbrGreen(v)/0.66*0.35)-0.15,0.02,0.21), 1.0);
 }
